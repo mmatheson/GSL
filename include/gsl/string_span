@@ -92,22 +92,22 @@ using wzstring = basic_zstring<wchar_t, Extent>;
 #ifndef GSL_MSVC_NO_CPP11_CHAR_TYPES
 
 template<std::ptrdiff_t Extent = dynamic_range>
-using cu16zstring = const char16_t*;
+using cu16zstring = basic_zstring<const char16_t*, Extent>;
 
 template<std::ptrdiff_t Extent = dynamic_range>
-using cu32zstring = const char32_t*;
+using cu32zstring = basic_zstring<const char32_t*, Extent>;
 
 template<std::ptrdiff_t Extent = dynamic_range>
-using u16zstring = char16_t*;
+using u16zstring = basic_zstring<char16_t*, Extent>;
 
 template<std::ptrdiff_t Extent = dynamic_range>
-using u32zstring = char32_t*;
+using u32zstring = basic_zstring<char32_t*, Extent>;
 
 #endif
 
 namespace details
 {
-    std::ptrdiff_t u16strnlen(const char16_t *str, std::ptrdiff_t n)
+    std::ptrdiff_t u16string_length(const char16_t *str, std::ptrdiff_t n)
     {
         if (str == nullptr || n <= 0) return 0;
 
@@ -119,7 +119,7 @@ namespace details
         return len;
     }
 
-    std::ptrdiff_t u32strnlen(const char32_t *str, std::ptrdiff_t n)
+    std::ptrdiff_t u32string_length(const char32_t *str, std::ptrdiff_t n)
     {
         if (str == nullptr || n <= 0) return 0;
 
@@ -218,28 +218,28 @@ inline span<const wchar_t, dynamic_extent> ensure_z(const wchar_t* const& sz, st
 
 inline span<char16_t, dynamic_range> ensure_z(char16_t* const& sz, std::ptrdiff_t max)
 {
-    auto len = details::u16strnlen(sz, max);
+    auto len = details::u16string_length(sz, max);
     Ensures(sz[len] == 0);
     return{ sz, len };
 }
 
 inline span<const char16_t, dynamic_range> ensure_z(const char16_t* const& sz, std::ptrdiff_t max)
 {
-    auto len = details::u16strnlen(sz, max);
+    auto len = details::u16string_length(sz, max);
     Ensures(sz[len] == 0);
     return{ sz, len };
 }
 
 inline span<char32_t, dynamic_range> ensure_z(char32_t* const& sz, std::ptrdiff_t max)
 {
-    auto len = details::u32strnlen(sz, max);
+    auto len = details::u32string_length(sz, max);
     Ensures(sz[len] == 0);
     return{ sz, len };
 }
 
 inline span<const char32_t, dynamic_range> ensure_z(const char32_t* const& sz, std::ptrdiff_t max)
 {
-    auto len = details::u32strnlen(sz, max);
+    auto len = details::u32string_length(sz, max);
     Ensures(sz[len] == 0);
     return{ sz, len };
 }
@@ -327,7 +327,7 @@ namespace details
     {
         std::ptrdiff_t operator()(char16_t* const ptr, std::ptrdiff_t length) noexcept
         {
-            return u16strnlen(ptr, length);
+            return u16string_length(ptr, length);
         }
     };
 
@@ -336,7 +336,7 @@ namespace details
     {
         std::ptrdiff_t operator()(const char16_t* const ptr, std::ptrdiff_t length) noexcept
         {
-            return u16strnlen(ptr, length);
+            return u16string_length(ptr, length);
         }
     };
 
@@ -345,7 +345,7 @@ namespace details
     {
         std::ptrdiff_t operator()(char32_t* const ptr, std::ptrdiff_t length) noexcept
         {
-            return u32strnlen(ptr, length);
+            return u32string_length(ptr, length);
         }
     };
 
@@ -354,7 +354,7 @@ namespace details
     {
         std::ptrdiff_t operator()(const char32_t* const ptr, std::ptrdiff_t length) noexcept
         {
-            return u32strnlen(ptr, length);
+            return u32string_length(ptr, length);
         }
     };
 
