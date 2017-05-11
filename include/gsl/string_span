@@ -91,23 +91,23 @@ using wzstring = basic_zstring<wchar_t, Extent>;
 
 #ifndef GSL_MSVC_NO_CPP11_CHAR_TYPES
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using cu16zstring = basic_zstring<const char16_t*, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using cu32zstring = basic_zstring<const char32_t*, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using u16zstring = basic_zstring<char16_t*, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using u32zstring = basic_zstring<char32_t*, Extent>;
 
 #endif
 
 namespace details
 {
-    std::ptrdiff_t u16string_length(const char16_t *str, std::ptrdiff_t n)
+    std::ptrdiff_t u16string_length(const char16_t* str, std::ptrdiff_t n)
     {
         if (str == nullptr || n <= 0) return 0;
 
@@ -119,7 +119,7 @@ namespace details
         return len;
     }
 
-    std::ptrdiff_t u32string_length(const char32_t *str, std::ptrdiff_t n)
+    std::ptrdiff_t u32string_length(const char32_t* str, std::ptrdiff_t n)
     {
         if (str == nullptr || n <= 0) return 0;
 
@@ -196,7 +196,7 @@ inline span<char, dynamic_extent> ensure_z(char* const& sz, std::ptrdiff_t max)
 inline span<const char, dynamic_extent> ensure_z(const char* const& sz, std::ptrdiff_t max)
 {
     auto len = details::string_length(sz, max);
-    Ensures(sz[len] == 0); 
+    Ensures(sz[len] == 0);
     return {sz, len};
 }
 
@@ -220,28 +220,28 @@ inline span<char16_t, dynamic_range> ensure_z(char16_t* const& sz, std::ptrdiff_
 {
     auto len = details::u16string_length(sz, max);
     Ensures(sz[len] == 0);
-    return{ sz, len };
+    return {sz, len};
 }
 
 inline span<const char16_t, dynamic_range> ensure_z(const char16_t* const& sz, std::ptrdiff_t max)
 {
     auto len = details::u16string_length(sz, max);
     Ensures(sz[len] == 0);
-    return{ sz, len };
+    return {sz, len};
 }
 
 inline span<char32_t, dynamic_range> ensure_z(char32_t* const& sz, std::ptrdiff_t max)
 {
     auto len = details::u32string_length(sz, max);
     Ensures(sz[len] == 0);
-    return{ sz, len };
+    return {sz, len};
 }
 
 inline span<const char32_t, dynamic_range> ensure_z(const char32_t* const& sz, std::ptrdiff_t max)
 {
     auto len = details::u32string_length(sz, max);
     Ensures(sz[len] == 0);
-    return{ sz, len };
+    return {sz, len};
 }
 
 #endif
@@ -561,16 +561,16 @@ using cwstring_span = basic_string_span<const wchar_t, Extent>;
 
 #ifndef GSL_MSVC_NO_CPP11_CHAR_TYPES
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using u16string_span = basic_string_span<char16_t, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using cu16string_span = basic_string_span<const char16_t, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using u32string_span = basic_string_span<char32_t, Extent>;
 
-template<std::ptrdiff_t Extent = dynamic_range>
+template <std::ptrdiff_t Extent = dynamic_range>
 using cu32string_span = basic_string_span<const char32_t, Extent>;
 
 #endif
@@ -613,22 +613,22 @@ inline std::wstring to_string(wstring_span<> view)
 
 inline std::u16string to_string(cu16string_span<> view)
 {
-    return{ view.data(), static_cast<size_t>(view.length()) };
+    return {view.data(), static_cast<size_t>(view.length())};
 }
 
 inline std::u16string to_string(u16string_span<> view)
 {
-    return{ view.data(), static_cast<size_t>(view.length()) };
+    return {view.data(), static_cast<size_t>(view.length())};
 }
 
 inline std::u32string to_string(cu32string_span<> view)
 {
-    return{ view.data(), static_cast<size_t>(view.length()) };
+    return {view.data(), static_cast<size_t>(view.length())};
 }
 
 inline std::u32string to_string(u32string_span<> view)
 {
-    return{ view.data(), static_cast<size_t>(view.length()) };
+    return {view.data(), static_cast<size_t>(view.length())};
 }
 
 #endif
