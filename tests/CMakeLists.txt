@@ -2,46 +2,70 @@ cmake_minimum_required(VERSION 2.8.7)
 
 project(GSLTests CXX)
 
-if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/unittest-cpp/tests)
-    execute_process(COMMAND git submodule update --init WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+# will make visual studio generated project group files
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/unittest-cpp/CMakeLists.txt)
+    find_package(Git)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} submodule update --init
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
 endif()
 
 add_subdirectory(unittest-cpp)
 
-include_directories(
-    ../include
+# this interface adds compile options to how the tests are run
+# please try to keep entries ordered =)
+add_library(gsl_tests_config INTERFACE)
+target_compile_options(gsl_tests_config INTERFACE
+    $<$<CXX_COMPILER_ID:MSVC>:
+        /EHsc
+        /W4
+        /WX
+    >
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:
+        -fno-strict-aliasing
+        -Wall
+        -Wcast-align
+        -Wconversion
+        -Wctor-dtor-privacy
+        -Werror
+        -Wextra
+        -Wno-missing-braces
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpedantic
+        -Wshadow
+        -Wsign-conversion
+    >
+)
+
+# set test to include the unittest-cpp headers
+# this shiuld be removed when UnitTest++ has the proper headers
+target_include_directories(gsl_tests_config INTERFACE
     ./unittest-cpp
 )
 
-add_definitions(-DGSL_THROW_ON_CONTRACT_VIOLATION)
-
-if(MSVC14 OR MSVC12) # has the support we need
-    # remove unnecessary warnings about unchecked iterators
-    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-    add_compile_options(/W4)
-else()
-    include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    if(COMPILER_SUPPORTS_CXX14)
-    	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wno-missing-braces")
-    elseif(COMPILER_SUPPORTS_CXX11)
-    	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-missing-braces")
-    else()
-      message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-    endif()
-endif()
+# set definitions for tests
+target_compile_definitions(gsl_tests_config INTERFACE
+    GSL_THROW_ON_CONTRACT_VIOLATION
+)
 
 function(add_gsl_test name)
-    add_executable(${name} ${name}.cpp ../include/gsl.h ../include/gsl_assert.h ../include/gsl_util.h ../include/multi_span.h ../include/span.h ../include/string_span.h)
-    target_link_libraries(${name} UnitTest++)
-    install(TARGETS ${name}
-        RUNTIME DESTINATION bin
+    add_executable(${name} ${name}.cpp)
+    target_link_libraries(${name}
+        UnitTest++
+        GSL
+        gsl_tests_config
     )
     add_test(
       ${name}
       ${name}
     )
+    # group all tests under GSL_tests
+    set_property(TARGET ${name} PROPERTY FOLDER "GSL_tests")
 endfunction()
 
 add_gsl_test(span_tests)
@@ -55,3 +79,4 @@ add_gsl_test(assertion_tests)
 add_gsl_test(utils_tests)
 add_gsl_test(owner_tests)
 add_gsl_test(byte_tests)
+add_gsl_test(algorithm_tests)

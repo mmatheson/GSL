@@ -15,23 +15,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <UnitTest++/UnitTest++.h>
-#include <gsl.h>
+
+#include <gsl/gsl>
+
 #include <functional>
 
 using namespace gsl;
 
 SUITE(utils_tests)
 {
-    void f(int& i)
-    {
-        i += 1;
-    }
+    void f(int& i) { i += 1; }
 
     TEST(finally_lambda)
     {
         int i = 0;
         {
-            auto _ = finally([&]() {f(i);});
+            auto _ = finally([&]() { f(i); });
             CHECK(i == 0);
         }
         CHECK(i == 1);
@@ -41,7 +40,7 @@ SUITE(utils_tests)
     {
         int i = 0;
         {
-            auto _1 = finally([&]() {f(i);});
+            auto _1 = finally([&]() { f(i); });
             {
                 auto _2 = std::move(_1);
                 CHECK(i == 0);
@@ -67,7 +66,7 @@ SUITE(utils_tests)
     }
 
     int j = 0;
-    void g() { j += 1; };
+    void g() { j += 1; }
     TEST(finally_function_ptr)
     {
         j = 0;
@@ -92,7 +91,7 @@ SUITE(utils_tests)
     TEST(narrow)
     {
         int n = 120;
-        char c = narrow<char>(n);
+        const char c = narrow<char>(n);
         CHECK(c == 120);
 
         n = 300;
@@ -113,7 +112,4 @@ SUITE(utils_tests)
     }
 }
 
-int main(int, const char *[])
-{
-    return UnitTest::RunAllTests();
-}
+int main(int, const char* []) { return UnitTest::RunAllTests(); }
